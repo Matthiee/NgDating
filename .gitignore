@@ -351,3 +351,4 @@ MigrationBackup/
 /DatingApp/DatingApp.API/datingapp.db
 /DatingApp/DatingApp.API/datingapp.db-shm
 /DatingApp/DatingApp.API/datingapp.db-wal
+appsettings.Development.json
