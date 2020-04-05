@@ -25,7 +25,7 @@ export class NavComponent implements OnInit {
       (error) => {
         this.alertify.error('Failed to login');
       },
-      (complete) => {
+      () => {
         this.router.navigate(['/members']);
       }
     );
