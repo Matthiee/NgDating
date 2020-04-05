@@ -12,6 +12,7 @@ namespace DatingApp.API.Data
         {
             if (context.Users.Any()) return;
 
+            // https://www.json-generator.com/
             var userData = File.ReadAllText("Data/UserSeedData.json");
             var users = JsonConvert.DeserializeObject<List<User>>(userData);
 
