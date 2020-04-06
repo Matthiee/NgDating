@@ -23,6 +23,7 @@ import { AuthService } from './_services/auth.service';
 import { AlertifyService } from './_services/alertify.service';
 import { UserService } from './_services/user.service';
 import { AuthGuard } from './_guard/auth.guard';
+import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -45,6 +46,7 @@ export function tokenGetter() {
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
+    NgxGalleryModule,
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     RouterModule.forRoot(appRoutes),

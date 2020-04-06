@@ -12,3 +12,8 @@
   padding: 10px 15px;
   border-top: none;
 }
+
+.gallery-panel {
+  width: 500px;
+  height: 500px;
+}
