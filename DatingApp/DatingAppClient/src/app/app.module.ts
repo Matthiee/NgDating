@@ -24,6 +24,9 @@ import { AlertifyService } from './_services/alertify.service';
 import { UserService } from './_services/user.service';
 import { AuthGuard } from './_guard/auth.guard';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
+import { MembersEditComponent } from './members/members-edit/members-edit.component';
+import { MemberEditResolver } from './_resolvers/member-edit.resolver';
+import { PreventUnsavedChanges } from './_guard/prevent-unsaved-changes.guard';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -40,6 +43,7 @@ export function tokenGetter() {
     MemberCardComponent,
     MessagesComponent,
     MemberDetailComponent,
+    MembersEditComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,13 +56,22 @@ export function tokenGetter() {
     RouterModule.forRoot(appRoutes),
     JwtModule.forRoot({
       config: {
-        tokenGetter: tokenGetter,
+        tokenGetter,
         whitelistedDomains: ['localhost:5000'],
         blacklistedRoutes: ['localhost:5000/api/auth'],
       },
     }),
   ],
-  providers: [MemberDetailResolver, MemberListResolver, AuthService, AlertifyService, UserService, AuthGuard],
+  providers: [
+    MemberDetailResolver,
+    MemberListResolver,
+    AuthService,
+    AlertifyService,
+    UserService,
+    AuthGuard,
+    PreventUnsavedChanges,
+    MemberEditResolver,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
