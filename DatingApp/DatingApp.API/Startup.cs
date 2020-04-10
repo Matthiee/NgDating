@@ -33,6 +33,7 @@ namespace DatingApp.API
             services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddScoped<IDatingRepository, DatingRepository>();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<LogUserActivity>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt => 
             {
                 opt.TokenValidationParameters = new TokenValidationParameters
