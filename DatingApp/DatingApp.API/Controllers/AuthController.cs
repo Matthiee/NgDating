@@ -36,17 +36,16 @@ namespace DatingApp.API.Controllers
             if (await auth.UserExists(userDto.Username))
                 return BadRequest();
 
-            var user = new User()
-            {
-                Username = userDto.Username
-            };
+            var user = mapper.Map<User>(userDto);
 
             user = await auth.Register(user, userDto.Password);
 
             if (user is null)
                 return BadRequest();
 
-            return StatusCode(201); // to be fixed later
+            var userToReturn = mapper.Map<UserForListDto>(user);
+
+            return CreatedAtRoute("GetUser", new { controller = "Users", id = user.Id }, userToReturn);
         }
 
         [HttpPost("login")]
