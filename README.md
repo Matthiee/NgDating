@@ -7,3 +7,5 @@ Angular 9 Dating app using ASP.NET Core and EF.Core
 | Angular              | 9.0.5   |
 | ASP.NET Core         | 3.1   |
 | EntityFramework.Core | 3.1.3   |
+| CloudinaryDotNet     | 1.10.0  |
+| AutoMapper           | 9.0.0  |
