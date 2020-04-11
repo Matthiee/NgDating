@@ -353,3 +353,4 @@ MigrationBackup/
 /DatingApp/DatingApp.API/datingapp.db-wal
 appsettings.Development.json
 /DatingApp/DatingApp.API/wwwroot
+/DatingApp/DatingApp.API/appsettings.Production.json
