@@ -78,7 +78,9 @@ namespace DatingApp.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateMessage(int userId, MessageForCreationDto messageForCreationDto)
         {
-            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            var sender = await repo.GetUser(userId);
+
+            if (sender.Id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
 
             messageForCreationDto.SenderId = userId;
@@ -97,9 +99,66 @@ namespace DatingApp.API.Controllers
                 return BadRequest();
             }
 
-            var messageToReturn = mapper.Map<MessageForCreationDto>(message);
+            // auto mapper will map in memory 'sender' and 'recipient' properties
+            var messageToReturn = mapper.Map<MessageToReturnDto>(message);
 
             return CreatedAtRoute("GetMessage", new { userId, id = message.Id }, messageToReturn);
+        }
+
+        [HttpPost("{id}")]
+        public async Task<IActionResult> DeleteMessage(int userId, int id)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            var messageFromRepo = await repo.GetMessage(id);
+
+            if (messageFromRepo == null)
+                return BadRequest();
+
+            if (messageFromRepo.SenderId == userId)
+            {
+                messageFromRepo.SenderDeleted = true;
+            }
+            else if (messageFromRepo.RecipientId == userId)
+            {
+                messageFromRepo.RecipientDeleted = true;
+            }
+
+            if (messageFromRepo.RecipientDeleted && messageFromRepo.SenderDeleted)
+            {
+                repo.Delete(messageFromRepo);
+            }
+
+            if (!(await repo.SaveAll()))
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
+        }
+
+
+        [HttpPost("{id}/read")]
+        public async Task<IActionResult> MarkAsRead(int userId, int id)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            var messageFromRepo = await repo.GetMessage(id);
+
+            if (messageFromRepo == null)
+                return BadRequest();
+
+            if (messageFromRepo.RecipientId != userId)
+                return Unauthorized();
+
+            messageFromRepo.IsRead = true;
+            messageFromRepo.DateRead = DateTime.Now;
+
+            await repo.SaveAll();
+
+            return NoContent();
         }
     }
 }

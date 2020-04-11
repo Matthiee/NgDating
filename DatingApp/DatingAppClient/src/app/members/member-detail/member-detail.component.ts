@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { User } from 'src/app/_models/user';
 import { ActivatedRoute } from '@angular/router';
 import { NgxGalleryImage, NgxGalleryOptions, NgxGalleryAnimation } from '@kolkov/ngx-gallery';
+import { TabsetComponent } from 'ngx-bootstrap/tabs/public_api';
 
 @Component({
   selector: 'app-member-detail',
@@ -9,6 +10,8 @@ import { NgxGalleryImage, NgxGalleryOptions, NgxGalleryAnimation } from '@kolkov
   styleUrls: ['./member-detail.component.css'],
 })
 export class MemberDetailComponent implements OnInit {
+  @ViewChild('memberTabs', { static: true }) memberTabs: TabsetComponent;
+
   user: User;
   galleryOptions: NgxGalleryOptions[];
   galleryImages: NgxGalleryImage[];
@@ -18,6 +21,11 @@ export class MemberDetailComponent implements OnInit {
     this.router.data.subscribe((data) => {
       this.user = data.user;
       this.galleryImages = this.getImages();
+    });
+
+    this.router.queryParams.subscribe((data) => {
+      const selectedTab = data['tab'];
+      this.memberTabs.tabs[selectedTab > 0 ? selectedTab : 0].active = true;
     });
 
     this.galleryOptions = [
@@ -46,5 +54,9 @@ export class MemberDetailComponent implements OnInit {
     }
 
     return imgUrls;
+  }
+
+  selectTab(tabId: number) {
+    this.memberTabs.tabs[tabId].active = true;
   }
 }
