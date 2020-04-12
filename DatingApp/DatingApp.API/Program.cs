@@ -20,19 +20,24 @@ namespace DatingApp.API
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
+                var logger = services.GetRequiredService<ILogger<Program>>();
 
                 try
                 {
                     var context = services.GetRequiredService<DataContext>();
                     var userManager = services.GetRequiredService<UserManager<User>>();
+                    var roleManager = services.GetRequiredService<RoleManager<Role>>();
 
+                    logger.LogInformation("Migrating database..");
                     await context.Database.MigrateAsync();
 
-                    await Seed.SeedUsers(userManager);
+                    logger.LogInformation("Seeding data..");
+                    await Seed.SeedUsers(userManager, roleManager);
+
+                    logger.LogInformation("Startup completed!");
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "An error occured during migration");
                 }
             }

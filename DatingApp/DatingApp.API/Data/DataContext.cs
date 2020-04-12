@@ -13,7 +13,6 @@ namespace DatingApp.API.Data
         IdentityRoleClaim<int>,
         IdentityUserToken<int>>
     {
-        public DbSet<Value> Values { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Message> Messages { get; set; }
