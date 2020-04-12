@@ -62,20 +62,6 @@ namespace DatingApp.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Values",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Values", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -253,7 +239,8 @@ namespace DatingApp.API.Migrations
                     IsMain = table.Column<bool>(nullable: false),
                     IsPrivate = table.Column<bool>(nullable: false),
                     UserId = table.Column<int>(nullable: false),
-                    PublicID = table.Column<string>(nullable: true)
+                    PublicID = table.Column<string>(nullable: true),
+                    IsApproved = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -349,9 +336,6 @@ namespace DatingApp.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Photos");
-
-            migrationBuilder.DropTable(
-                name: "Values");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

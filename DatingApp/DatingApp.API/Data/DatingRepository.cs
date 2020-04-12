@@ -36,10 +36,17 @@ namespace DatingApp.API.Data
             => await context.Photos.Where(u => u.UserId == userId).FirstOrDefaultAsync(p => p.IsMain);
 
         public async Task<Photo> GetPhoto(int id)
-            => await context.Photos.FirstOrDefaultAsync(p => p.Id == id);
+            => await context.Photos.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == id);
 
-        public async Task<User> GetUser(int id)
-            => await context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        public async Task<User> GetUser(int id, bool isCurrentUser)
+        {
+            var query = context.Users.Include(p => p.Photos).AsQueryable();
+
+            if (isCurrentUser)
+                query = query.IgnoreQueryFilters();
+
+            return await query.FirstOrDefaultAsync(u => u.Id == id);
+        }
 
         public async Task<PagedList<User>> GetUsers(UserParams userParams)
         {
@@ -126,7 +133,7 @@ namespace DatingApp.API.Data
         {
             var messages = await context.Messages
                 .Where(m => m.RecipientId == userId && !m.RecipientDeleted && m.SenderId == recipientId
-                    || m.RecipientId == recipientId && !m.SenderDeleted  && m.SenderId == userId)
+                    || m.RecipientId == recipientId && !m.SenderDeleted && m.SenderId == userId)
                 .OrderByDescending(m => m.MessageSent)
                 .ToListAsync();
 

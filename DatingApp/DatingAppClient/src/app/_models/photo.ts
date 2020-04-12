@@ -5,4 +5,5 @@ export interface Photo {
   dateAdded: Date;
   isMain: boolean;
   isPrivate: boolean;
+  isApproved: boolean;
 }

@@ -21,7 +21,7 @@ export class HasRoleDirective implements OnInit {
       this.viewContainerRef.clear();
     }
 
-    if (this.auth.roleMatch(userRoles)) {
+    if (this.auth.roleMatch(this.appHasRole)) {
       if (!this.isVisible) {
         this.isVisible = true;
         this.viewContainerRef.createEmbeddedView(this.templateRef);

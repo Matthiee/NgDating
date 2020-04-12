@@ -33,6 +33,7 @@ namespace DatingApp.API.Data
 
             foreach (var user in users)
             {
+                user.Photos.SingleOrDefault().IsApproved = true;
                 await userManager.CreateAsync(user, "password");
                 await userManager.AddToRoleAsync(user, "Member");
             }

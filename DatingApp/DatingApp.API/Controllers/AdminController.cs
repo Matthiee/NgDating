@@ -1,10 +1,14 @@
-﻿using DatingApp.API.Data;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using DatingApp.API.Data;
 using DatingApp.API.Dto;
+using DatingApp.API.Helper;
 using DatingApp.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +22,24 @@ namespace DatingApp.API.Controllers
     {
         private readonly DataContext context;
         private readonly UserManager<User> userManager;
+        private readonly IOptions<CloudinarySettings> options;
+        private readonly Cloudinary cloudinary;
 
-        public AdminController(DataContext context, UserManager<User> userManager)
+        public AdminController(DataContext context, UserManager<User> userManager, IOptions<CloudinarySettings> options)
         {
             this.context = context;
             this.userManager = userManager;
+
+            this.options = options;
+
+            Account account = new Account
+            {
+                ApiKey = options.Value.ApiKey,
+                ApiSecret = options.Value.ApiSecret,
+                Cloud = options.Value.CloudName
+            };
+
+            cloudinary = new Cloudinary(account);
         }
 
         [Authorize(Policy = "RequireAdminRole")]
@@ -47,7 +64,7 @@ namespace DatingApp.API.Controllers
 
         [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("editRoles/{userName}")]
-        public async Task<IActionResult> GetUserWithRoles(string userName, RoleEditDto roleEditDto)
+        public async Task<IActionResult> GetUserWithRoles(string userName, [FromBody] RoleEditDto roleEditDto)
         {
             var user = await userManager.FindByNameAsync(userName);
 
@@ -76,9 +93,68 @@ namespace DatingApp.API.Controllers
 
         [Authorize(Policy = "ModeratePhotoRole")]
         [HttpGet("photosForModeration")]
-        public IActionResult GetPhotosForModeration()
+        public async Task<IActionResult> GetPhotosForModeration()
         {
-            return Ok("Admins and/or mods can see this");
+            var photos = await context.Photos
+                .Include(u => u.User)
+                .IgnoreQueryFilters()
+                .Where(p => !p.IsApproved)
+                .Select(u => new
+                {
+                    Id = u.Id,
+                    UserName = u.User.UserName,
+                    Url = u.Url,
+                    IsApproved = u.IsApproved
+                }).ToListAsync();
+
+            return Ok(photos);
+        }
+
+        [Authorize(Policy = "ModeratePhotoRole")]
+        [HttpPost("approvePhoto/{photoId}")]
+        public async Task<IActionResult> ApprovePhoto(int photoId)
+        {
+            var photo = await context.Photos
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(p => p.Id == photoId);
+
+            photo.IsApproved = true;
+
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [Authorize(Policy = "ModeratePhotoRole")]
+        [HttpPost("rejectPhoto/{photoId}")]
+        public async Task<IActionResult> RejectPhoto(int photoId)
+        {
+            var photo = await context.Photos
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(p => p.Id == photoId);
+
+            if (photo.IsMain)
+                return BadRequest("You cannot reject the main photo");
+
+            if (photo.PublicID != null)
+            {
+                var deleteParams = new DeletionParams(photo.PublicID);
+
+                var result = await cloudinary.DestroyAsync(deleteParams);
+
+                if (result.Result == "ok")
+                {
+                    context.Photos.Remove(photo);
+                }
+            }
+            else
+            {
+                context.Photos.Remove(photo);
+            }
+
+            await context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

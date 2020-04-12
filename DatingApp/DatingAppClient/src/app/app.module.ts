@@ -32,6 +32,7 @@ import { PhotoEditorComponent } from './members/photo-editor/photo-editor.compon
 import { FileUploadModule } from 'ng2-file-upload';
 import { TimeagoModule } from 'ngx-timeago';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import { ListsResolver } from './_resolvers/lists.resolver';
 import { MessagesResolver } from './_resolvers/messages.resolver';
@@ -41,6 +42,7 @@ import { HasRoleDirective } from './_directives/hasRole.directive';
 import { UserManagementComponent } from './admin/user-management/user-management.component';
 import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
 import { AdminService } from './_services/admin.service';
+import { RolesModalComponent } from './admin/roles-modal/roles-modal.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -52,6 +54,7 @@ export function tokenGetter() {
     AdminPanelComponent,
     NavComponent,
     HomeComponent,
+    RolesModalComponent,
     RegisterComponent,
     MemberListComponent,
     ListsComponent,
@@ -69,6 +72,7 @@ export function tokenGetter() {
     FileUploadModule,
     BsDatepickerModule.forRoot(),
     BrowserModule,
+    ModalModule.forRoot(),
     HttpClientModule,
     TimeagoModule.forRoot(),
     PaginationModule.forRoot(),
@@ -102,6 +106,7 @@ export function tokenGetter() {
     ListsResolver,
     MessagesResolver,
   ],
+  entryComponents: [RolesModalComponent],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
