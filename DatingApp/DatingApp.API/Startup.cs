@@ -92,6 +92,13 @@ namespace DatingApp.API
                     ValidateAudience = false
                 };
             });
+
+            services.AddAuthorization(config => 
+            {
+                config.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                config.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Moderator"));
+                config.AddPolicy("VipOnly", policy => policy.RequireRole("VIP"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
